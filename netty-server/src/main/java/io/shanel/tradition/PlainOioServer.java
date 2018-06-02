@@ -55,4 +55,12 @@ public class PlainOioServer {
             log.error(e.getMessage(), e);
         }
     }
+
+    public static void main(String[] args) {
+        try {
+            new PlainOioServer().serve(8588);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 }

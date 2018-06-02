@@ -31,15 +31,15 @@ public class PlainNioServer {
     private static final Logger log = LoggerFactory.getLogger(PlainNioServer.class);
 
     public void serve(int port) throws IOException {
-        ServerSocketChannel channel = ServerSocketChannel.open();
-        channel.configureBlocking(false);
-        ServerSocket socket = channel.socket();
+        ServerSocketChannel socketChannel = ServerSocketChannel.open();
+        socketChannel.configureBlocking(false);
+        ServerSocket socket = socketChannel.socket();
 
         InetSocketAddress address = new InetSocketAddress(port);
         socket.bind(address);
 
         Selector selector = Selector.open();
-        channel.register(selector, SelectionKey.OP_ACCEPT);
+        socketChannel.register(selector, SelectionKey.OP_ACCEPT);
 
         ByteBuffer msg = ByteBuffer.wrap("Hello".getBytes(Charset.forName("UTF-8")));
         for (; ; ) {

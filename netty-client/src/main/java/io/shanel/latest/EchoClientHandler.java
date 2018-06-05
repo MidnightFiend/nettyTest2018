@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2017 Sohu TV. All rights reserved.
  */
-package io.shanel.netty;
+package io.shanel.latest;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

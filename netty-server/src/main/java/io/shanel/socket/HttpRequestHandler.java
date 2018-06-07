@@ -40,7 +40,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         try {
             String path = location.toURI() + "index.html";
             path = !path.contains("file:") ? path : path.substring(5);
-            log.info("path---------> {}", path);
+            System.out.println("path---------> " + path);
             INDEX = new File(path);
         } catch (Exception e) {
             log.error(e.getMessage(), e);

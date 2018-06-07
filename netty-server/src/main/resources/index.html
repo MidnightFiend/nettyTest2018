@@ -16,13 +16,9 @@
 
         .putLeft{float:right;}
     </style>
-    <script type="text/javascript" src="http://admin.qf.56.sohuno.com/managemain/js/jquery-1.11.1.min.js"></script>
-    <script type="text/javascript" src="http://admin.qf.56.sohuno.com/managemain/js/jquery.blockUI.js"></script>
+    <script type="text/javascript" src="https://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://malsup.github.io/min/jquery.blockUI.min.js"></script>
     <script type="text/javascript">
-        function log(msg) {
-            var log = $('#log')
-            log.append(msg + " \n").scrollTop(log[0].scrollHeight - log.height());
-        }
         $(function () {
             $.unblockUI();
 
@@ -83,6 +79,11 @@
                 })
             }
         })
+
+        function log(msg) {
+            var log = $('#log')
+            log.append(msg + " \n").scrollTop(log[0].scrollHeight - log.height());
+        }
 
         function time() {
             var date = new Date();

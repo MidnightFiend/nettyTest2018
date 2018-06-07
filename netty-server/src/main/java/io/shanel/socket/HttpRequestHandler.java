@@ -40,6 +40,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         try {
             String path = location.toURI() + "index.html";
             path = !path.contains("file:") ? path : path.substring(5);
+            log.info("path---------> {}", path);
             INDEX = new File(path);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -53,21 +54,21 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
-        if (wsUri.equalsIgnoreCase(msg.getUri())) {
+        if (wsUri.equalsIgnoreCase(msg.uri())) {
             ctx.fireChannelRead(msg.retain());
         } else {
-            if (HttpHeaders.is100ContinueExpected(msg)) {
+            if (HttpUtil.is100ContinueExpected(msg)) {
                 send100Continue(ctx);
             }
             RandomAccessFile file = new RandomAccessFile(INDEX, "r");
-            DefaultHttpResponse response = new DefaultHttpResponse(msg.getProtocolVersion(), HttpResponseStatus.OK);
+            DefaultHttpResponse response = new DefaultHttpResponse(msg.protocolVersion(), HttpResponseStatus.OK);
             response.headers()
-                    .set(HttpHeaders.Names.CONTENT_TYPE, "text/plain; charset=UTF-8");
-            boolean keepAlive = HttpHeaders.isKeepAlive(msg);
+                    .set(HttpHeaderNames.CONTENT_TYPE, "text/html; charset=UTF-8");
+            boolean keepAlive = HttpUtil.isKeepAlive(msg);
             if (keepAlive) {
                 response.headers()
-                        .set(HttpHeaders.Names.CONTENT_LENGTH, file.length())
-                        .set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+                        .set(HttpHeaderNames.CONTENT_LENGTH, file.length())
+                        .set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
             }
             ctx.write(response);
             if (ctx.pipeline().get(SslHandler.class) == null) {

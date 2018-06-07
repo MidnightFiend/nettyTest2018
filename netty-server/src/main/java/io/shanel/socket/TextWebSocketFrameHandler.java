@@ -11,6 +11,8 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * <p>
  * Description:
@@ -25,21 +27,31 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
 
     private final ChannelGroup group;
 
+    private static ConcurrentHashMap<String, String> nameCache = new ConcurrentHashMap();
+
     public TextWebSocketFrameHandler(ChannelGroup group) {
         this.group = group;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
-        group.writeAndFlush(msg.retain());
+        TextWebSocketFrame textFrame = msg.retain();
+        String channelName = ctx.pipeline().channel().toString();
+        String nick = nameCache.get(channelName);
+        if (nick == null) {
+            nick = textFrame.text();
+            nameCache.put(channelName, nick);
+        } else {
+            group.writeAndFlush(new TextWebSocketFrame(nick + ":" + textFrame.text()));
+        }
     }
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        if (evt == WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE) {
+        if (evt == WebSocketServerProtocolHandler.HandshakeComplete.class) {
             ctx.pipeline().remove(HttpRequestHandler.class);
-            group.writeAndFlush(new TextWebSocketFrame("Client " + ctx.channel() + " joined"));
             group.add(ctx.channel());
+            group.writeAndFlush(new TextWebSocketFrame("Client " + ctx.channel() + " joined"));
         } else {
             super.userEventTriggered(ctx, evt);
         }

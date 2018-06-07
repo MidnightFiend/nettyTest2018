@@ -60,12 +60,7 @@ public class ChatServer {
     }
 
     public static void main(String[] args) {
-        if (args.length != 1) {
-            System.err.println("get right port");
-            System.exit(1);
-        }
-
-        int port = Integer.parseInt(args[0]);
+        int port = 9998;
         final ChatServer endPoint = new ChatServer();
         ChannelFuture future = endPoint.start(new InetSocketAddress(port));
         Runtime.getRuntime().addShutdownHook(new Thread() {

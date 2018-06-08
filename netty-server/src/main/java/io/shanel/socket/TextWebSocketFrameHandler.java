@@ -34,6 +34,18 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
     }
 
     @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt == WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE) {
+            ctx.pipeline().remove(HttpRequestHandler.class);
+            group.writeAndFlush(new TextWebSocketFrame(
+                    "Client " + ctx.channel() + " joined"));
+            group.add(ctx.channel());
+        } else {
+            super.userEventTriggered(ctx, evt);
+        }
+    }
+
+    @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
         TextWebSocketFrame textFrame = msg.retain();
         String channelName = ctx.pipeline().channel().toString();
@@ -43,17 +55,6 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
             nameCache.put(channelName, nick);
         } else {
             group.writeAndFlush(new TextWebSocketFrame(nick + ":" + textFrame.text()));
-        }
-    }
-
-    @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        if (evt == WebSocketServerProtocolHandler.HandshakeComplete.class) {
-            ctx.pipeline().remove(HttpRequestHandler.class);
-            group.add(ctx.channel());
-            group.writeAndFlush(new TextWebSocketFrame("Client " + ctx.channel() + " joined"));
-        } else {
-            super.userEventTriggered(ctx, evt);
         }
     }
 }

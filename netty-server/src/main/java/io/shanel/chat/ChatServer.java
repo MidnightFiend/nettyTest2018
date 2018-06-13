@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2017 Sohu TV. All rights reserved.
  */
-package io.shanel.socket;
+package io.shanel.chat;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;

@@ -8,7 +8,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +38,9 @@ public class LogEventBroadcaster {
         this.eventLoopGroup = new NioEventLoopGroup();
         this.bootstrap = new Bootstrap();
         this.file = new File(filePath);
+        System.out.println("file: "+file.length());
         bootstrap.group(eventLoopGroup)
-                .channel(NioServerSocketChannel.class)
+                .channel(NioDatagramChannel.class)
                 .option(ChannelOption.SO_BROADCAST, true)
                 .handler(new LogEventEncoder(address));
     }
@@ -58,6 +59,7 @@ public class LogEventBroadcaster {
                 accessFile.seek(pointer);
                 String line;
                 while ((line = accessFile.readLine()) != null) {
+                    System.out.println("------> " + line);
                     channel.writeAndFlush(new LogEvent(file.getAbsolutePath(), line));
                 }
                 pointer = accessFile.getFilePointer();
@@ -79,7 +81,7 @@ public class LogEventBroadcaster {
 
     public static void main(String[] args) {
         int port = 9995;
-        String path = "";
+        String path = "D:\\log\\ForCode\\nettyLog.txt";
 
         LogEventBroadcaster broadcaster = new LogEventBroadcaster(new InetSocketAddress("255.255.255.255", port), path);
         try {
